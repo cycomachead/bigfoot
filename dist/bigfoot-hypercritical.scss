@@ -1,3 +1,6 @@
+// bigfoot - v2.0.3 - 2014.07.15
+
+
 //  ___ __ __    ________  __     __    ________  ___   __    ______
 // /__//_//_/\  /_______/\/__/\ /__/\  /_______/\/__/\ /__/\ /_____/\
 // \::\| \| \ \ \__.::._\/\ \::\\:.\ \ \__.::._\/\::\_\\  \ \\::::_\/_
@@ -6,6 +9,8 @@
 //    \. \  \  \ \/__\::\__/\\ \ \ \::\ \/__\::\__/\\. \`-\  \ \ /____\:\
 //     \__\/ \__\/\________\/ \_\/  \__\/\________\/ \__\/ \__\/ \_____\/
 //
+
+@import "bourbon";
 
 @mixin transitions($transitions...) {
     $transition: nth($transitions, 1);
@@ -24,31 +29,19 @@
 @mixin transition-property($properties) {
     $prefixes: ("-webkit-", "-moz-", "-ms-", "");
 
-    @for $i from 1 through length($prefixes) {
-        #{unquote(nth($prefixes, $i))}transition-property: prefix-properties($properties, nth($prefixes, $i));
-    }
-}
-
-@mixin transition-duration($duration) {
-    $prefixes: ("-webkit-", "-moz-", "-ms-", "");
-
-    @for $i from 1 through length($prefixes) {
-        #{unquote(nth($prefixes, $i))}transition-duration: $duration;
-    }
-}
-
-@mixin transition-delay($delay) {
-    $prefixes: ("-webkit-", "-moz-", "-ms-", "");
-
-    @for $i from 1 through length($prefixes) {
-        #{unquote(nth($prefixes, $i))}transition-delay: $delay;
+    @each $prefix in $prefixes {
+        #{unquote($prefix)}transition: prefix-properties($properties, $prefix);
     }
 }
 
 @function prefix-properties($properties, $prefix) {
     $new-props: property-checker(nth($properties, 1), $prefix);
-    @for $i from 2 through length($properties) {
-        $new-props: $new-props + ", " + property-checker(nth($properties, $i), $prefix);
+    @if(length($properties) > 1) {
+        @if length($properties) > 1 {
+            @for $i from 2 through length($properties) {
+                $new-props: $new-props + ", " + property-checker(nth($properties, $i), $prefix);
+            }
+        }
     }
     @return unquote($new-props);
 }
@@ -60,25 +53,6 @@
         @return quote($property);
     }
 }
-
-
-@mixin transform($transform) {
-    $prefixes: ("-webkit-", "-moz-", "-ms-", "");
-
-    @for $i from 1 through length($prefixes) {
-        #{unquote(nth($prefixes, $i))}transform: $transform;
-    }
-}
-
-
-@mixin transform-origin($transform-origin) {
-    $prefixes: ("-webkit-", "-moz-", "-ms-", "");
-
-    @for $i from 1 through length($prefixes) {
-        #{unquote(nth($prefixes, $i))}transform-origin: $transform-origin;
-    }
-}
-
 
 @mixin long-shadow($type, $color, $length, $horizontalTo: left, $verticalTo: bottom) {
     $shadow: '';
@@ -122,24 +96,47 @@
     background: linear-gradient(to $towards, $startColor 0%, $startColor $stop, $toColor 100%);
 }
 
+@mixin print-styles {
+    // These styles restore the original footnote numbers and texts when the page is printed
+    @media not print {
+        .footnote-print-only {
+            display: none !important;
+        }
+    }
+
+    @media print {
+        .footnote-button {
+            display: none !important;
+        }
+    }
+}
 
 
 
+// -----
 
-//  ___   __    __  __   ___ __ __    _______   ______   ______
-// /__/\ /__/\ /_/\/_/\ /__//_//_/\ /_______/\ /_____/\ /_____/\
-// \::\_\\  \ \\:\ \:\ \\::\| \| \ \\::: _  \ \\::::_\/_\:::_ \ \
-//  \:. `-\  \ \\:\ \:\ \\:.      \ \\::(_)  \/_\:\/___/\\:(_) ) )_
-//   \:. _    \ \\:\ \:\ \\:.\-/\  \ \\::  _  \ \\::___\/_\: __ `\ \
-//    \. \`-\  \ \\:\_\:\ \\. \  \  \ \\::(_)  \ \\:\____/\\ \ `\ \ \
-//     \__\/ \__\/ \_____\/ \__\/ \__\/ \_______\/ \_____\/ \_\/ \_\/
-//         ____________________________________________________________
-//        /___________________________________________________________/\
-//        \___________________________________________________________\/
+
+//  ___   ___   __  __   ______   ______   ______    ______   ______     ________  _________  ________  ______   ________   __
+// /__/\ /__/\ /_/\/_/\ /_____/\ /_____/\ /_____/\  /_____/\ /_____/\   /_______/\/________/\/_______/\/_____/\ /_______/\ /_/\
+// \::\ \\  \ \\ \ \ \ \\:::_ \ \\::::_\/_\:::_ \ \ \:::__\/ \:::_ \ \  \__.::._\/\__.::.__\/\__.::._\/\:::__\/ \::: _  \ \\:\ \
+//  \::\/_\ .\ \\:\_\ \ \\:(_) \ \\:\/___/\\:(_) ) )_\:\ \  __\:(_) ) )_   \::\ \    \::\ \     \::\ \  \:\ \  __\::(_)  \ \\:\ \
+//   \:: ___::\ \\::::_\/ \: ___\/ \::___\/_\: __ `\ \\:\ \/_/\\: __ `\ \  _\::\ \__  \::\ \    _\::\ \__\:\ \/_/\\:: __  \ \\:\ \____
+//    \: \ \\::\ \ \::\ \  \ \ \    \:\____/\\ \ `\ \ \\:\_\ \ \\ \ `\ \ \/__\::\__/\  \::\ \  /__\::\__/\\:\_\ \ \\:.\ \  \ \\:\/___/\
+//     \__\/ \::\/  \__\/   \_\/     \_____\/ \_\/ \_\/ \_____\/ \_\/ \_\/\________\/   \__\/  \________\/ \_____\/ \__\/\__\/ \_____\/
 //
-// Circular, dark gray background which fades in through :hover/.active
-// and includes the footnote number within the circle
+//         ______________________________________________________________________________________________________________________________
+//        /_____________________________________________________________________________________________________________________________/\
+//        \_____________________________________________________________________________________________________________________________\/
+//
+// Default for the footnote button: dark gray background which fades in through :hover/.active
+// and includes a light gray ellipsis within the button
 
+
+.footnote-container {
+    display: inline-block;
+    position: relative;
+    text-indent: 0;
+}
 
 
 //  ___   ___   ______   __  __     __   __   ________   ______    ______
@@ -153,42 +150,42 @@
 // These are the key variables for styling the button.
 // Just set the variable to none if you don't want that styling.
 
-$button-height:                         1em;                            // The total height of the button
-$button-width:                          1em;                            // The total button width (applies only if $button-apply-dimensions is true)
-$button-inner-circle-size:              0.35em;                         // Total height/width of the ellipsis circles
-$button-border-radius:                  0.6em;                          // Border radius on the button itself
+$button-height:                         0.9em;                          // The total height of the button
+$button-width:                          auto;                           // The total button width (applies only if $button-apply-dimensions is true)
+$button-inner-circle-size:              0.3em;                         // Total height/width of the ellipsis circles
+$button-border-radius:                  0.3em;                          // Border radius on the button itself
 $button-left-margin:                    0.2em;                          // Margin between the button and the text to its left
 $button-right-margin:                   0.1em;                          // Margin between the button and the text to its right
-$button-vertical-adjust:                -0.2em;                         // Pushes the buttons along the vertical axis to align it with text as desired
-$button-inner-circle-left-margin:       0.5*$button-inner-circle-size;  // Space between the ellipsis circles
+$button-vertical-adjust:                -0.3em;                         // Pushes the buttons along the vertical axis to align it with text as desired
+$button-inner-circle-left-margin:       0.7*$button-inner-circle-size;  // Space between the ellipsis circles
 
-$button-color:                          rgb(70, 70, 70);                // Background color of the button
+$button-color:                          rgb(86, 114, 113);              // Background color of the button
 $button-hovered-color:                  $button-color;                  // Background color of the button when being hovered
 $button-activating-color:               $button-color;                  // Background color of the button when being clicked
 $button-active-color:                   $button-color;                  // Background color of the button when active
-$button-standard-opacity:               0.3;                            // Opacity for when the button is just sittin' there
-$button-hovered-opacity:                0.6;                            // Opacity for when the button is being hovered over
-$button-activating-opacity:             $button-hovered-opacity;        // Opacity for when the button is being clicked
-$button-active-opacity:                 0.9;                            // Opacity for when the button is active
+$button-standard-opacity:               1;                              // Opacity for when the button is just sittin' there
+$button-hovered-opacity:                $button-standard-opacity;       // Opacity for when the button is being hovered over
+$button-activating-opacity:             $button-standard-opacity;       // Opacity for when the button is being clicked
+$button-active-opacity:                 $button-standard-opacity;       // Opacity for when the button is active
 $button-active-style-delay:             0.15s;                          // Delay before applying .active styles; this can be used to match to the popover activation transition
 
-$button-inner-circle-color:             none;                           // Background color of the ellipsis circle
+$button-inner-circle-color:             white;                          // Background color of the ellipsis circle
 $button-inner-circle-border:            none;                           // Border of the ellipsis circle
-$button-perspective-shadow-color:       none;                           // The color of the button front
-$button-perspective-shadow-height:      none;                           // The (unpressed) height of the button
-$button-perspective-active-height:      none;                           // The height of the activated button
+$button-perspective-shadow-color:       rgb(115, 189, 79);              // The color of the button front
+$button-perspective-shadow-height:      0.35em;                         // The (unpressed) height of the button
+$button-perspective-active-height:      0.1em;                          // The height of the activated button
 $button-content:                        none;                           // Text to insert using :before on the button
-$button-content-color:                  white;                          // Color of the inserted text
-$button-content-font-size:              0.8em;                          // Font size of the inserted text
-$button-content-vertical-adjust:        0.63em;                         // Vertical adjustment of the inserted text (to center it in the button)
-$button-content-font-family:            inherit;                        // Font family of the inserted text
-$button-content-font-weight:            bold;                           // Font weight of the inserted text
-$button-content-font-style:             normal;                         // Font style of the inserted text
+$button-content-color:                  none;                           // Color of the inserted text
+$button-content-font-size:              none;                           // Font size of the inserted text
+$button-content-vertical-adjust:        none;                           // Vertical adjustment of the inserted text (to center it in the button)
+$button-content-font-family:            none;                           // Font family of the inserted text
+$button-content-font-weight:            none;                           // Font weight of the inserted text
+$button-content-font-style:             none;                           // Font style of the inserted text
 
-$button-use-ellipsis:                   false;                          // Determines whether or not the footnote circles will be styled
-$button-use-number:                     true;                           // Determines whether the footnote number will be included
-$button-use-perspective-shadow:         false;                          // Determines whether or not a pretend button front will be used (makes the button function like a cartoonish, toggle-able button)
-$button-apply-dimensions:               true;                           // Determines whether or not the dimensions above will apply directly to the footnote button (use for creating particular button shapes, like a circle)
+$button-use-ellipsis:                   true;                           // Determines whether or not the footnote circles will be styled
+$button-use-number:                     false;                          // Determines whether the footnote number will be included
+$button-use-perspective-shadow:         true;                           // Determines whether or not a pretend button front will be used (makes the button function like a cartoonish, toggle-able button)
+$button-apply-dimensions:               false;                          // Determines whether or not the dimensions above will apply directly to the footnote button (use for creating particular button shapes, like a circle)
 
 
 
@@ -226,6 +223,7 @@ $button-perspective-shadow-zindex:  8;
 
     // DISPLAY AND SIZING
     box-sizing: border-box;
+    -moz-box-sizing: border-box;;
     display: inline-block;
     padding: $button-per-side-padding;
     margin: 0 $button-right-margin 0 $button-left-margin;
@@ -245,6 +243,7 @@ $button-perspective-shadow-zindex:  8;
     line-height: 0;
     vertical-align: middle;
     text-decoration: none;
+    font-smoothing: antialiased;
 
     // TRANSITIONS AND ANIMATIONS
     @include transition-property(opacity);
@@ -269,6 +268,7 @@ $button-perspective-shadow-zindex:  8;
         @if $button-active-color != $button-color { background-color: $button-active-color; }
         @include transition-delay($button-active-style-delay);
     }
+
 
     @if $button-use-perspective-shadow == true {
         // Adjust the button downwards as needed
@@ -325,6 +325,10 @@ $button-perspective-shadow-zindex:  8;
 
     .footnote-circle {
 
+        // POSITION
+        position: relative;
+        z-index: 10;
+
         // DISPLAY AND SIZING
         display: inline-block;
         width: $button-inner-circle-size;
@@ -335,9 +339,6 @@ $button-perspective-shadow-zindex:  8;
         border-radius: 100%;
         background-color: $button-inner-circle-color;
         border: $button-inner-circle-border;
-
-        // TEXT
-        line-height: 0.5em;
 
         &:last-child { margin-right: 0; } // Gets rid of margin on the last circle
 
@@ -363,9 +364,9 @@ $button-perspective-shadow-zindex:  8;
         // CONTENT
         @if $button-use-number == true {
             content: attr(data-footnote-identifier);
-        } @else {
-            content: $button-content;
-        }
+            } @else {
+                content: $button-content;
+            }
 
         // POSITIONING
         position: absolute;
@@ -389,23 +390,35 @@ $button-perspective-shadow-zindex:  8;
 
 
 
-
-
-//  ______   ______   ______   ________   __  __   __     _________
-// /_____/\ /_____/\ /_____/\ /_______/\ /_/\/_/\ /_/\   /________/\
-// \:::_ \ \\::::_\/_\::::_\/_\::: _  \ \\:\ \:\ \\:\ \  \__.::.__\/
-//  \:\ \ \ \\:\/___/\\:\/___/\\::(_)  \ \\:\ \:\ \\:\ \    \::\ \
-//   \:\ \ \ \\::___\/_\:::._\/ \:: __  \ \\:\ \:\ \\:\ \____\::\ \
-//    \:\/.:| |\:\____/\\:\ \    \:.\ \  \ \\:\_\:\ \\:\/___/\\::\ \
-//     \____/_/ \_____\/ \_\/     \__\/\__\/ \_____\/ \_____\/ \__\/
-//         ___________________________________________________________
-//        /__________________________________________________________/\
-//        \__________________________________________________________\/
 //
-// Default style for the popover: light gray background, dark gray border, box-shadow,
-// and scales/ fades in when activated
+//  ______   ______     ________  ___   __    _________
+// /_____/\ /_____/\   /_______/\/__/\ /__/\ /________/\
+// \:::_ \ \\:::_ \ \  \__.::._\/\::\_\\  \ \\__.::.__\/
+//  \:(_) \ \\:(_) ) )_   \::\ \  \:. `-\  \ \  \::\ \
+//   \: ___\/ \: __ `\ \  _\::\ \__\:. _    \ \  \::\ \
+//    \ \ \    \ \ `\ \ \/__\::\__/\\. \`-\  \ \  \::\ \
+//     \_\/     \_\/ \_\/\________\/ \__\/ \__\/   \__\/
+//
+
+@include print-styles;
 
 
+// -----
+
+
+//  ___   ___   __  __   ______   ______   ______    ______   ______     ________  _________  ________  ______   ________   __
+// /__/\ /__/\ /_/\/_/\ /_____/\ /_____/\ /_____/\  /_____/\ /_____/\   /_______/\/________/\/_______/\/_____/\ /_______/\ /_/\
+// \::\ \\  \ \\ \ \ \ \\:::_ \ \\::::_\/_\:::_ \ \ \:::__\/ \:::_ \ \  \__.::._\/\__.::.__\/\__.::._\/\:::__\/ \::: _  \ \\:\ \
+//  \::\/_\ .\ \\:\_\ \ \\:(_) \ \\:\/___/\\:(_) ) )_\:\ \  __\:(_) ) )_   \::\ \    \::\ \     \::\ \  \:\ \  __\::(_)  \ \\:\ \
+//   \:: ___::\ \\::::_\/ \: ___\/ \::___\/_\: __ `\ \\:\ \/_/\\: __ `\ \  _\::\ \__  \::\ \    _\::\ \__\:\ \/_/\\:: __  \ \\:\ \____
+//    \: \ \\::\ \ \::\ \  \ \ \    \:\____/\\ \ `\ \ \\:\_\ \ \\ \ `\ \ \/__\::\__/\  \::\ \  /__\::\__/\\:\_\ \ \\:.\ \  \ \\:\/___/\
+//     \__\/ \::\/  \__\/   \_\/     \_____\/ \_\/ \_\/ \_____\/ \_\/ \_\/\________\/   \__\/  \________\/ \_____\/ \__\/\__\/ \_____\/
+//
+//         ______________________________________________________________________________________________________________________________
+//        /_____________________________________________________________________________________________________________________________/\
+//        \_____________________________________________________________________________________________________________________________\/
+//
+// Similar to default, but with a lighter background and Hypercritical fonts/ border colors.
 
 //  ___   ___   ______   __  __     __   __   ________   ______    ______
 // /___/\/__/\ /_____/\ /_/\/_/\   /_/\ /_/\ /_______/\ /_____/\  /_____/\
@@ -422,12 +435,12 @@ $button-perspective-shadow-zindex:  8;
 $popover-width:                         22em;                           // Ideal width of the popover
 $popover-max-width:                     90%;                            // Best as a % to accommodate smaller viewports
 $popover-max-height:                    15em;                           // Maximum size of the content area
-$popover-color-background:              rgb(250, 250, 250);             // Color of the popover background
+$popover-color-background:              rgb(253, 253, 253);             // Color of the popover background
 $popover-border-radius:                 0.5em;                          // Radius of the corners of the popover
-$popover-border:                        1px solid rgb(195, 195, 195);   // Border of the popover/ tooltip
+$popover-border:                        2px solid rgb(86, 114, 113);    // Border of the popover/ tooltip
 $popover-inactive-opacity:              0;                              // Opacity of the popover when instantiated/ deactivating
 $popover-active-opacity:                0.97;                           // Opacity of the popover when active
-$popover-box-shadow:                    0px 0px 8px rgba(0, 0, 0, 0.3); // Sets the box shadow under the popover/ tooltip
+$popover-box-shadow:                    0px 0px 5px rgba(0, 0, 0, 0.2); // Sets the box shadow under the popover/ tooltip
 $popover-display-style:                 inline-block;                   // Determines the display style of the main popover
 $popover-bottom-position:               auto;                           // Sets the bottom position of the popover. Use only when setting positionPopover to false in the script
 $popover-left-position:                 auto;                           // Sets the left position of the popover. Use only when setting positionPopover to false in the script
@@ -439,9 +452,8 @@ $popover-active-transform-state:        scale(1) translateZ(0);         // The t
 
 // OPTIONAL ELEMENTS
 $popover-include-tooltip:               true;                           // Adds a tooltip pointing to the footnote button
-$popover-include-scroll-indicator:      true;                           // Adds an elipsis at the bottom of scrollable popovers
-$popover-include-scrolly-fades:         true;                           // Fades content in on scrollable popovers
-$popover-width-application-element:     content;                        // content or the popover itself
+$popover-include-scroll-indicator:      false;                          // Adds an elipsis at the bottom of scrollable popovers
+$popover-include-scrolly-fades:         false;                          // Fades content in on scrollable popovers
 
 
 
@@ -501,25 +513,25 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
 .footnote-content {
 
     // POSITIONING
-    position: fixed;
+    position: absolute;
     z-index: $popover-z-index;
-    bottom: $popover-bottom-position;
-    left: $popover-left-position;
+    top: 0; left: 0;
 
     // DISPLAY AND SIZING
+    display: inline-block;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;;
     // Height is set in .footnote-content-wrapper
-    @if $popover-width-application-element == popover {
-        width: $popover-width;
-    } @else {
-        max-width: $popover-max-width;
-    }
+    max-width: $popover-max-width;
+
     // 1.414213... is to get the diagonal height of the tooltip using pythagorus, yo.
-    margin: ((1.4142135624 * $popover-tooltip-size / 2) + $button-height / 2 + $popover-margin-top) auto;
+    margin: ((1.4142135624 * $popover-tooltip-size / 2) + $button-height + $popover-margin-top) 0;
     display: $popover-display-style; // fits the popover to the contents
     @if $popover-initial-transform-state != none {
-        @include transform($popover-initial-transform-state);
-        @include transform-origin($popover-initial-transform-origin);
+        &:not(.fixed-bottom) {
+            @include transform($popover-initial-transform-state);
+            @include transform-origin($popover-initial-transform-origin);
+        }
     }
 
     // BACKDROP
@@ -528,6 +540,7 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
     border-radius: $popover-border-radius;
     border: $popover-border;
     box-shadow: $popover-box-shadow;
+    line-height: 0;
 
     // TRANSITIONS AND ANIMATIONS
     @if $popover-transition != none {
@@ -535,8 +548,12 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
         @include transition-duration($popover-transition-default-duration);
     }
 
+    &.top {
+        top: auto; bottom: 0.2em;
+    }
+
     // Put styles here to apply when the popover is active (can be transitioned in/ out of from the CSS properties above)
-    &.active {
+    &.active:not(.fixed-bottom) {
         @if $popover-active-transform-state != none { @include transform($popover-active-transform-state); }
         opacity: $popover-active-opacity;
     }
@@ -546,14 +563,40 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
 
     }
 
-    // Put styles to apply when the popover is positioning on the bottom of the footnote button
-    &.bottom {
-        @include transform-origin(top);
-    }
+    &.fixed-bottom {
 
-    // Put styles to apply when the popover is positioning on the top of the footnote button
-    &.top {
-        @include transform-origin(bottom);
+        // POSITIONING
+        bottom: 0 !important;
+        top: auto !important;
+        left: 0 !important;
+
+        // DISPLAY AND SIZING
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        @include transform(translateY(105%));
+
+        // BACKDROP
+        border-radius: 0;
+        opacity: 1;
+
+        // TRANSITIONS AND ANIMATIONS
+        @include transition-property(transform);
+        @include transition-duration($popover-transition-default-duration);
+
+        &.active {
+            @include transform(translateY(0));
+        }
+
+        .footnote-main-wrapper {
+            max-width: $popover-max-width;
+            width: $popover-width;
+            margin: 0 auto;
+        }
+
+        .bigfoot-tooltip {
+            display: none;
+        }
     }
 
     // Put styles to apply when the popover scroll height is greater than its content max-height
@@ -665,14 +708,12 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
     z-index: $popover-z-index + 4; // Above the outer tooltip, below the inner tooltip
 
     // DISPLAY AND SIZING
+    width: $popover-width;
+    display: inline-block;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
     overflow: hidden;
     margin: 0;
-    @if $popover-width-application-element == content {
-        max-width: $popover-width;
-    } @else {
-        max-width: $popover-max-width;
-    }
 
     // BACKDROP
     background-color: $popover-color-background;
@@ -703,15 +744,20 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
     z-index: $popover-z-index - 2; // Below fading bars
 
     // DISPLAY AND SIZING
+    display: inline-block;
     max-height: $popover-max-height;
     padding: $popover-padding-content-top $popover-padding-content-horizontal $popover-padding-content-bottom;
     box-sizing: border-box;
-    overflow: auto;
+    -moz-box-sizing: border-box;;
+    overflow: scroll;
     -webkit-overflow-scrolling: touch;
 
     // BACKDROP
     background: $popover-content-color-background;
     border-radius: $popover-content-border-radius;
+
+    // TEXT
+    -webkit-font-smoothing: subpixel-antialiased;
 
     // INTERIOR ELEMENTS
     img { max-width: 100%; }
@@ -733,7 +779,7 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
 // These create the tooltip. The horizontal positioning of the tooltip is set by the script itself
 @if $popover-include-tooltip == true {
 
-    .tooltip {
+    .bigfoot-tooltip {
 
         // POSITIONING
         position: absolute;
@@ -741,6 +787,7 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
 
         // DISPLAY AND SIZING
         box-sizing: border-box;
+        -moz-box-sizing: border-box;;
         margin-left: -0.5 * ($popover-tooltip-size);
         width: $popover-tooltip-size; // Smaller by one border-width's worth
         height: $popover-tooltip-size;
@@ -755,18 +802,18 @@ $popover-scroll-up-transition-delay:            0.4s; // Sets the delay for the 
     }
 
     // Mandatory vertical-positioning stuff for the tooltip
-    .bottom .tooltip {
+    .bottom .bigfoot-tooltip {
         top: -0.5 * $popover-tooltip-size;
         bottom: auto;
     }
 
-    .top .tooltip {
+    .top .bigfoot-tooltip {
         bottom: -0.5 * $popover-tooltip-size;
         top: auto;
     }
 
 } @else {
 
-    .tooltip { display: none; }
+        .bigfoot-tooltip { display: none; }
 
 } // end of the tooltip styling
